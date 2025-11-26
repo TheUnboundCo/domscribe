@@ -1,0 +1,40 @@
+{
+  "name": "@domscribe/relay",
+  "version": "0.0.1-dev.167",
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client/index.ts",
+    "./program": "./src/program/index.ts"
+  },
+  "distExports": {
+    "./client": "./client/index.js",
+    "./program": "./program/index.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "distBin": {
+    "domscribe": "./cli/bin/main.js",
+    "domscribe-mcp": "./cli/bin/mcp.js"
+  },
+  "dependencies": {
+    "@domscribe/core": "workspace:*",
+    "@domscribe/manifest": "workspace:*",
+    "@fastify/cors": "^10.0.0",
+    "@fastify/websocket": "^11.0.0",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "commander": "^14.0.2",
+    "fastify": "^5.0.0",
+    "fastify-type-provider-zod": "^6.1.0",
+    "nanoid": "^5.0.0",
+    "semver": "^7.7.4",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/semver": "^7.7.1",
+    "@types/ws": "^8.18.1",
+    "ws": "^8.19.0"
+  }
+}
