@@ -1,0 +1,22 @@
+{
+  "name": "@domscribe/nuxt",
+  "version": "0.0.1-dev.167",
+  "type": "module",
+  "main": "src/index.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@domscribe/relay": "workspace:*",
+    "@domscribe/transform": "workspace:*",
+    "@domscribe/runtime": "workspace:*",
+    "@domscribe/vue": "workspace:*"
+  },
+  "devDependencies": {
+    "@nuxt/kit": "^4.0.0",
+    "@nuxt/schema": "^4.0.0"
+  },
+  "peerDependencies": {
+    "nuxt": ">=3.0.0"
+  }
+}
