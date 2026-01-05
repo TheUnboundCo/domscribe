@@ -1,0 +1,60 @@
+<script setup lang="ts">
+/**
+ * App.vue - Main application shell
+ *
+ * Provides sidebar navigation + main content area layout.
+ * Mirrors the structure of the React test fixture.
+ */
+import { ref, computed, markRaw, type Component } from 'vue';
+import Navigation from './Navigation.vue';
+
+// Import all test components
+<%- componentImports %>
+
+interface ComponentConfig {
+  id: string;
+  title: string;
+  description: string;
+  component: Component;
+}
+
+const components: ComponentConfig[] = [
+<%- componentConfigs.replace(/component: (\w+),/g, 'component: markRaw($1),') %>
+];
+
+const activeComponent = ref('<%= defaultComponentId %>');
+
+const currentComponent = computed(() => {
+  return components.find((c) => c.id === activeComponent.value) || components[0];
+});
+
+function handleNavigate(id: string) {
+  activeComponent.value = id;
+}
+</script>
+
+<template>
+  <div class="app">
+    <Navigation
+      :active-item="activeComponent"
+      @navigate="handleNavigate"
+    />
+
+    <main class="main-content">
+      <div class="content-wrapper">
+        <header class="page-header">
+          <h1 class="page-title">{{ currentComponent.title }}</h1>
+          <p class="page-description">{{ currentComponent.description }}</p>
+        </header>
+
+        <div class="component-section">
+          <component :is="currentComponent.component" />
+        </div>
+      </div>
+    </main>
+  </div>
+</template>
+
+<style scoped>
+/* Styles are in index.css */
+</style>
