@@ -1,0 +1,19 @@
+{
+  "id": "vite-v5-react-18-ts",
+  "framework": "react",
+  "frameworkVersion": "18",
+  "bundler": "vite",
+  "bundlerVersion": "5",
+  "language": "ts",
+  "tags": ["full-kitchen-sink", "smoke-test", "capture"],
+  "capabilities": {
+    "runtimeCapture": true,
+    "strategies": ["fiber", "devtools", "best-effort"],
+    "smokeTest": true
+  },
+  "devServer": {
+    "command": "vite",
+    "port": 0,
+    "readyPattern": "Local:"
+  }
+}

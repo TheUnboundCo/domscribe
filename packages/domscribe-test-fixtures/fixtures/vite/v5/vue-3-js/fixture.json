@@ -1,0 +1,19 @@
+{
+  "id": "vite-v5-vue-3-js",
+  "framework": "vue",
+  "frameworkVersion": "3",
+  "bundler": "vite",
+  "bundlerVersion": "5",
+  "language": "js",
+  "tags": ["full-kitchen-sink", "smoke-test", "capture"],
+  "capabilities": {
+    "runtimeCapture": true,
+    "strategies": ["vnode"],
+    "smokeTest": true
+  },
+  "devServer": {
+    "command": "vite",
+    "port": 0,
+    "readyPattern": "Local:"
+  }
+}
