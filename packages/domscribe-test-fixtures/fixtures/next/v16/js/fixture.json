@@ -1,0 +1,18 @@
+{
+  "id": "next-v16-js",
+  "framework": "next",
+  "frameworkVersion": "16",
+  "baseFramework": "react",
+  "language": "js",
+  "tags": ["full-kitchen-sink", "smoke-test", "capture"],
+  "capabilities": {
+    "runtimeCapture": true,
+    "strategies": ["fiber", "devtools", "best-effort"],
+    "smokeTest": true
+  },
+  "devServer": {
+    "command": "next dev",
+    "port": 0,
+    "readyPattern": "Ready in"
+  }
+}
