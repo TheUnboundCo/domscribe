@@ -1,0 +1,15 @@
+{
+  "name": "domscribe",
+  "owner": {
+    "name": "Patch Orbit",
+    "url": "https://www.patchorbit.com"
+  },
+  "plugins": [
+    {
+      "name": "domscribe",
+      "description": "Domscribe plugin for DOM annotation and resolution.",
+      "source": "./packages/domscribe-relay/src/agent-plugins/claude-code",
+      "homepage": "https://github.com/patchorbit/domscribe"
+    }
+  ]
+}

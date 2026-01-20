@@ -1,0 +1,18 @@
+{
+  "name": "domscribe",
+  "owner": {
+    "name": "Patch Orbit",
+    "email": "kaushik@patchorbit.com"
+  },
+  "metadata": {
+    "description": "Domscribe plugin for DOM annotation and resolution.",
+    "version": "0.0.1"
+  },
+  "plugins": [
+    {
+      "name": "domscribe",
+      "description": "Domscribe plugin for DOM annotation and resolution.",
+      "source": "./packages/domscribe-relay/src/agent-plugins/cursor"
+    }
+  ]
+}
