@@ -8,13 +8,13 @@
     "build:all": "nx run-many -t=lint,test,build --exclude domscribe-test-fixtures --output-style=stream",
     "build:affected": "nx affected -t lint,test,build --exclude domscribe-test-fixtures --output-style=stream",
     "release:version:local": "nx release version prerelease --preid dev --git-commit=false --git-tag=false --stage-changes=false",
-    "release:publish:local": "nx run-many -t sync-dist && nx release publish --registry=http://localhost:4873 --access public",
+    "release:publish:local": "nx run-many -t sync-dist && nx release publish --registry=http://localhost:4873",
     "release:local": "pnpm run build:all && pnpm run release:version:local && pnpm run release:publish:local",
     "release:local:affected": "pnpm run build:affected && pnpm run release:version:local && pnpm run release:publish:local",
-    "release:patch": "pnpm run build:all && nx release version patch && pnpm run release:publish",
-    "release:minor": "pnpm run build:all && nx release version minor && pnpm run release:publish",
-    "release:major": "pnpm run build:all && nx release version major && pnpm run release:publish",
-    "release:publish": "nx run-many -t sync-dist && nx release publish",
+    "release:post-version": "nx run sync-versions && git add -A && git commit -m \"chore: release v$(node -p \"require('./package.json').version\")\" && git tag \"v$(node -p \"require('./package.json').version\")\"",
+    "release:patch": "nx release version patch && pnpm run release:post-version",
+    "release:minor": "nx release version minor && pnpm run release:post-version",
+    "release:major": "nx release version major && pnpm run release:post-version",
     "registry:publish": "pnpm run build:all && pnpm run registry:publish:only",
     "registry:publish:only": "pnpm run release:version:local && pnpm run release:publish:local",
     "registry:install": "npx tsx packages/domscribe-test-fixtures/scripts/install-fixture.ts",
@@ -97,6 +97,12 @@
   "nx": {
     "includedScripts": [],
     "targets": {
+      "sync-versions": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "node scripts/sync-versions.mjs"
+        }
+      },
       "local-registry": {
         "executor": "@nx/js:verdaccio",
         "options": {

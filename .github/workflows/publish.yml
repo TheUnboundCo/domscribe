@@ -7,7 +7,7 @@ on:
 
 permissions:
   id-token: write # Required for OIDC trusted publishing
-  contents: read
+  contents: write # Required for creating GitHub Releases
 
 jobs:
   checks:
@@ -56,3 +56,20 @@ jobs:
 
       - name: Publish to npm
         run: npx nx release publish --yes
+
+      - name: Build Gemini extension archive
+        run: |
+          mkdir -p tmp/gemini-archive
+          cp packages/domscribe-relay/src/plugins/gemini/gemini-extension.json tmp/gemini-archive/
+          cp -r packages/domscribe-relay/src/plugins/gemini/skills tmp/gemini-archive/ 2>/dev/null || true
+          tar -czf tmp/domscribe-gemini-extension.tar.gz -C tmp/gemini-archive .
+
+      - name: Create GitHub Release
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          gh release create "$VERSION" \
+            --title "$VERSION" \
+            --generate-notes \
+            tmp/domscribe-gemini-extension.tar.gz
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

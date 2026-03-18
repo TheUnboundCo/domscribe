@@ -11,10 +11,6 @@
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license" /></a>
 </p>
 
-<p align="center">
-  <img src="./docs/demo.gif" alt="Domscribe demo — click an element, capture context, resolve to source" width="720" />
-</p>
-
 ---
 
 **AI coding agents edit your source files blind — they can't see your running frontend, and your frontend can't tell them where to look.**
@@ -103,11 +99,8 @@ Domscribe has two sides: **app-side** (bundler + framework plugins) and **agent-
 
 ### Step 1 — Add to Your App
 
-#### Next.js (15 + 16)
-
-```bash
-npm install -D @domscribe/next
-```
+<details>
+<summary><strong>Next.js (15 + 16)</strong> — <code>npm install -D @domscribe/next</code></summary>
 
 ```ts
 // next.config.ts
@@ -119,11 +112,10 @@ const nextConfig: NextConfig = {};
 export default withDomscribe()(nextConfig);
 ```
 
-#### Nuxt 3+
+</details>
 
-```bash
-npm install -D @domscribe/nuxt
-```
+<details>
+<summary><strong>Nuxt 3+</strong> — <code>npm install -D @domscribe/nuxt</code></summary>
 
 ```ts
 // nuxt.config.ts
@@ -132,13 +124,12 @@ export default defineNuxtConfig({
 });
 ```
 
-#### React 18-19
+</details>
 
-```bash
-npm install -D @domscribe/react
-```
+<details>
+<summary><strong>React 18–19</strong> — <code>npm install -D @domscribe/react</code></summary>
 
-You can use the vite plugin:
+Vite plugin:
 
 ```ts
 // vite.config.ts
@@ -151,7 +142,7 @@ export default defineConfig({
 });
 ```
 
-Or use the webpack plugin:
+Webpack plugin:
 
 ```ts
 // webpack.config.js
@@ -162,13 +153,12 @@ module.exports = {
 };
 ```
 
-#### Vue 3+
+</details>
 
-```bash
-npm install -D @domscribe/vue
-```
+<details>
+<summary><strong>Vue 3+</strong> — <code>npm install -D @domscribe/vue</code></summary>
 
-You can use the vite plugin:
+Vite plugin:
 
 ```ts
 // vite.config.ts
@@ -181,7 +171,7 @@ export default defineConfig({
 });
 ```
 
-Or use the webpack plugin:
+Webpack plugin:
 
 ```ts
 // webpack.config.js
@@ -192,15 +182,12 @@ module.exports = {
 };
 ```
 
-#### Any framework
+</details>
 
-If you only need DOM→source mapping without runtime context capture (props/state), install the transform plugin directly:
+<details>
+<summary><strong>Any framework</strong> — <code>npm install -D @domscribe/transform</code> (DOM→source mapping only, no runtime capture)</summary>
 
-```bash
-npm install -D @domscribe/transform
-```
-
-You can use the vite plugin:
+Vite plugin:
 
 ```ts
 // vite.config.ts
@@ -212,7 +199,7 @@ export default defineConfig({
 });
 ```
 
-Or use the webpack plugin:
+Webpack plugin:
 
 ```js
 // webpack.config.js
@@ -225,6 +212,8 @@ module.exports = {
 };
 ```
 
+</details>
+
 > **Working examples:** See [`packages/domscribe-test-fixtures/fixtures/`](./packages/domscribe-test-fixtures/fixtures/) for complete app setups across every supported framework and bundler combination.
 
 ### Step 2 — Connect Your Coding Agent
@@ -233,15 +222,36 @@ Domscribe exposes its full tool surface (12 tools + 4 prompts) via MCP. Agent pl
 
 For agents with first-class plugin support, install the plugin and you're done:
 
-| Agent          | Integration                          |
-| -------------- | ------------------------------------ |
-| Claude Code    | ✅ Plugin with skills and MCP config |
-| Cursor         | ✅ Plugin with skills and MCP config |
-| GitHub Copilot | ✅ Plugin with skills and MCP config |
-| Gemini CLI     | ✅ Plugin with skills and MCP config |
-| Amazon Kiro    | ✅ Plugin with skills and MCP config |
+#### Claude Code
 
-No plugin for your agent? No problem! Install our skills:
+```shell
+/plugin marketplace add patchorbit/domscribe
+/plugin install domscribe@domscribe
+```
+
+#### GitHub Copilot
+
+```bash
+copilot plugin install patchorbit/domscribe
+```
+
+#### Gemini CLI
+
+```bash
+gemini extensions install https://github.com/patchorbit/domscribe
+```
+
+#### Amazon Kiro
+
+Open the Powers panel → **Add power from GitHub** → enter `https://github.com/patchorbit/domscribe`.
+
+#### Cursor
+
+_(Coming soon — pending marketplace approval)_
+
+#### Any agent (Skills and MCP)
+
+Install the Domscribe skills:
 
 ```sh
 npx skills add patchorbit/domscribe
@@ -281,19 +291,19 @@ Then add this MCP config to your agent:
 
 ## Comparison
 
-| Feature               | Domscribe                                    | Stagewise                | DevInspector MCP                         | React Grab                            | Frontman                  |
-| --------------------- | -------------------------------------------- | ------------------------ | ---------------------------------------- | ------------------------------------- | ------------------------- |
-| Build-time stable IDs | ✅ `data-ds` via AST                         | ❌ Proxy-based           | ❌ No stable IDs                         | ❌ `_debugSource`                     | ❌ Source maps            |
-| DOM→source manifest   | ✅ JSONL, append-only                        | ❌                       | ❌                                       | ❌                                    | ❌                        |
-| Code→live DOM query   | ✅ Agent queries source, gets live runtime   | ❌                       | ❌                                       | ❌                                    | ❌                        |
-| Runtime props/state   | ✅ Fiber + VNode walking                     | ⚠️ Shallow               | ⚠️ DOM-level + JS eval                   | ⚠️ Shallow (bippy)                    | ⚠️ Framework APIs         |
-| Multi-framework       | ✅ React · Vue · Next.js · Nuxt · extensible | ✅ React + Vue + Angular | ✅ React + Vue + Svelte + Solid + Preact | ❌ React only                         | ⚠️ Next.js + Astro + Vite |
-| Multi-bundler         | ✅ Vite + Webpack + Turbopack                | ❌ N/A (proxy)           | ✅ Vite + Webpack + Turbopack            | ❌ N/A                                | ❌ Dev server middleware  |
-| MCP tools             | ✅ 12 tools + 4 prompts                      | ❌ Proprietary protocol  | ✅ 9 tools                               | ⚠️ Lightweight add-on                 | ❌ Built-in agent         |
-| Agent-agnostic        | ✅ Any MCP client                            | ⚠️ IDE extensions only   | ✅                                       | ✅                                    | ❌ Bundled Elixir agent   |
-| In-app element picker | ✅ Lit shadow DOM                            | ✅ Toolbar               | ✅ Inspector bar                         | ✅ Click-to-capture                   | ✅ Chat interface         |
-| Source mapping        | ✅ Deterministic (AST IDs)                   | ⚠️ AI-inferred           | ⚠️ AST-injected (not stable)             | ⚠️ `_debugSource` (workaround needed) | ⚠️ Source maps            |
-| License               | ✅ MIT                                       | ⚠️ AGPL                  | ✅ Open source                           | ✅ Open source                        | ⚠️ Apache + AGPL          |
+| Feature               | Domscribe                                    | [Stagewise](https://github.com/stagewise-io/stagewise) | [DevInspector MCP](https://github.com/mcpc-tech/dev-inspector-mcp) | [React Grab](https://github.com/aidenybai/react-grab) | [Frontman](https://github.com/frontman-ai/frontman) |
+| --------------------- | -------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------ | ----------------------------------------------------- | --------------------------------------------------- |
+| Build-time stable IDs | ✅ `data-ds` via AST                         | ❌ Proxy-based                                         | ❌ No stable IDs                                                   | ❌ `_debugSource`                                     | ❌ Source maps                                      |
+| DOM→source manifest   | ✅ JSONL, append-only                        | ❌                                                     | ❌                                                                 | ❌                                                    | ❌                                                  |
+| Code→live DOM query   | ✅ Agent queries source, gets live runtime   | ❌                                                     | ❌                                                                 | ❌                                                    | ❌                                                  |
+| Runtime props/state   | ✅ Fiber + VNode walking                     | ⚠️ Shallow                                             | ⚠️ DOM-level + JS eval                                             | ⚠️ Shallow (bippy)                                    | ⚠️ Framework APIs                                   |
+| Multi-framework       | ✅ React · Vue · Next.js · Nuxt · extensible | ✅ React + Vue + Angular                               | ✅ React + Vue + Svelte + Solid + Preact                           | ❌ React only                                         | ⚠️ Next.js + Astro + Vite                           |
+| Multi-bundler         | ✅ Vite + Webpack + Turbopack                | ❌ N/A (proxy)                                         | ✅ Vite + Webpack + Turbopack                                      | ❌ N/A                                                | ❌ Dev server middleware                            |
+| MCP tools             | ✅ 12 tools + 4 prompts                      | ❌ Proprietary protocol                                | ✅ 9 tools                                                         | ⚠️ Lightweight add-on                                 | ❌ Built-in agent                                   |
+| Agent-agnostic        | ✅ Any MCP client                            | ⚠️ IDE extensions only                                 | ✅                                                                 | ✅                                                    | ❌ Bundled Elixir agent                             |
+| In-app element picker | ✅ Lit shadow DOM                            | ✅ Toolbar                                             | ✅ Inspector bar                                                   | ✅ Click-to-capture                                   | ✅ Chat interface                                   |
+| Source mapping        | ✅ Deterministic (AST IDs)                   | ⚠️ AI-inferred                                         | ⚠️ AST-injected (not stable)                                       | ⚠️ `_debugSource` (workaround needed)                 | ⚠️ Source maps                                      |
+| License               | ✅ MIT                                       | ⚠️ AGPL                                                | ✅ Open source                                                     | ✅ Open source                                        | ⚠️ Apache + AGPL                                    |
 
 No single competitor combines build-time stable IDs, deep runtime capture, bidirectional source↔DOM querying, and an MCP tool surface in a framework-agnostic way.
 
@@ -309,6 +319,80 @@ The transform plugins work with any framework. Install one and every JSX/Vue tem
 | Webpack 5 | `@domscribe/transform/plugins/webpack` | Babel (TS/JSX) or VueSFC |
 | Turbopack | Self-initializing loader               | Babel (TS/JSX)           |
 
+### Transformer Configuration
+
+All plugins accept the same core options. Bundler-specific differences are noted below.
+
+#### Shared Options
+
+**Relay** — controls the local relay daemon that connects the browser and your agent:
+
+| Option      | Type      | Default       | Description                                 |
+| ----------- | --------- | ------------- | ------------------------------------------- |
+| `autoStart` | `boolean` | `true`        | Auto-start the relay daemon if not running  |
+| `port`      | `number`  | `0` (dynamic) | Relay server port (only used when starting) |
+| `host`      | `string`  | `'127.0.0.1'` | Relay server host (only used when starting) |
+
+**Overlay** — configures the in-app element picker and annotation UI:
+
+| Option        | Type                              | Default       | Description                              |
+| ------------- | --------------------------------- | ------------- | ---------------------------------------- |
+| `overlay`     | `boolean \| OverlayPluginOptions` | `true`        | Enable/disable or configure the overlay  |
+| `initialMode` | `'collapsed' \| 'expanded'`       | `'collapsed'` | Initial display mode for the overlay tab |
+| `debug`       | `boolean`                         | `false`       | Enable debug logging in the overlay      |
+
+#### Vite Plugin
+
+```ts
+import { domscribe } from '@domscribe/transform/plugins/vite';
+
+domscribe({
+  include: /\.(jsx|tsx|vue)$/i, // File pattern to transform (default)
+  exclude: /node_modules|\.test\.|\.spec\./i, // Files to skip (default)
+  debug: false,
+  relay: { autoStart: true, port: 0, host: '127.0.0.1' },
+  overlay: true, // or { initialMode: 'collapsed', debug: false }
+});
+```
+
+#### Webpack Plugin
+
+```ts
+import { DomscribeWebpackPlugin } from '@domscribe/transform/plugins/webpack';
+
+new DomscribeWebpackPlugin({
+  enabled: true, // Defaults to true in dev, false in production
+  debug: false,
+  relay: { autoStart: true, port: 0, host: '127.0.0.1' },
+  overlay: true,
+});
+```
+
+#### Turbopack Loader
+
+Turbopack has no plugin system, so the loader is self-initializing — it manages relay lifecycle and overlay injection directly.
+
+```ts
+// next.config.ts (turbopack)
+{
+  turbopack: {
+    rules: {
+      '*.{tsx,jsx}': {
+        loaders: [{
+          loader: '@domscribe/transform/turbopack-loader',
+          options: {
+            enabled: true,
+            debug: false,
+            relay: { autoStart: true, port: 0, host: '127.0.0.1' },
+            overlay: true,
+          },
+        }],
+      },
+    },
+  },
+}
+```
+
 ## Framework Support — Runtime Context Capture
 
 Framework adapters capture live props, state, and component metadata from the running app. We ship adapters for:
@@ -321,6 +405,43 @@ Framework adapters capture live props, state, and component metadata from the ru
 | Nuxt 3+       | `@domscribe/nuxt`  | Vue adapter + auto-configured Nuxt module        |
 
 Using a different framework? The `FrameworkAdapter` interface in `@domscribe/runtime` lets you build your own adapter — implement `getComponentInstance`, `captureProps`, and `captureState`, and the rest of the pipeline (element tracking, PII redaction, relay transmission) works automatically. See the [Custom Adapters Guide](./packages/domscribe-runtime/CUSTOM_ADAPTERS.md) for the full interface, a worked example, and integration instructions.
+
+### RuntimeManager Configuration
+
+`RuntimeManager` is the browser-side singleton that captures live props, state, and DOM context from instrumented elements. It is initialized automatically by the framework adapters (`@domscribe/react`, `@domscribe/vue`, etc.), but you can configure it directly:
+
+```ts
+import { RuntimeManager } from '@domscribe/runtime';
+
+const runtime = RuntimeManager.getInstance();
+await runtime.initialize({
+  adapter: myAdapter,
+  debug: false,
+  redactPII: true,
+  blockSelectors: [],
+});
+```
+
+| Option           | Type               | Default       | Description                                                                 |
+| ---------------- | ------------------ | ------------- | --------------------------------------------------------------------------- |
+| `adapter`        | `FrameworkAdapter` | `NoopAdapter` | Framework adapter for runtime context capture                               |
+| `debug`          | `boolean`          | `false`       | Enable debug logging                                                        |
+| `redactPII`      | `boolean`          | `true`        | Redact potentially sensitive values (emails, tokens, etc.) in captured data |
+| `blockSelectors` | `string[]`         | `[]`          | CSS selectors for elements to skip during capture                           |
+
+The `FrameworkAdapter` interface expected by `adapter`:
+
+```ts
+interface FrameworkAdapter {
+  readonly name: string;
+  readonly version?: string;
+  getComponentInstance(element: HTMLElement): Nullable<unknown>;
+  captureProps(component: unknown): Nullable<Record<string, unknown>>;
+  captureState(component: unknown): Nullable<Record<string, unknown>>;
+  getComponentName?(component: unknown): Nullable<string>;
+  getComponentTree?(component: unknown): Nullable<ComponentTreeNode>;
+}
+```
 
 ---
 
@@ -408,7 +529,19 @@ domscribe-mcp       # Standalone MCP server binary (use this in your agent's MCP
 
 ## Integration Tests
 
-CI runs three jobs: checks (lint/test/build/typecheck), integration, and e2e. All tests run against real published packages via a Verdaccio local registry — no mocked package resolution. Fixtures cover React 18/19 (Vite 5, Webpack 5), Next.js 15/16, Vue 3 (Vite 5, Webpack 5), and Nuxt 3. E2E tests use Playwright with real browser interaction including shadow DOM piercing.
+CI runs four pipeline stages, with integration and e2e parallelized across fixtures:
+
+```
+checks (lint, test, build, typecheck)
+    ↓
+build-registry (build → publish to Verdaccio → upload storage artifact)
+    ↓
+integration [8 fixtures in parallel]     e2e [14 fixtures in parallel]
+```
+
+All tests run against real published packages via a Verdaccio local registry — no mocked package resolution. The `build-registry` job publishes once and uploads the registry storage as an artifact; downstream matrix jobs download it and start Verdaccio from the pre-populated storage.
+
+**Fixtures**: React 18/19 (Vite 5, Webpack 5), Next.js 15/16, Vue 3 (Vite 5, Webpack 5), and Nuxt 3. Integration tests validate builds programmatically (Vite/Webpack only). E2E tests use Playwright with real browser interaction including shadow DOM piercing.
 
 ---
 

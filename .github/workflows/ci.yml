@@ -30,7 +30,7 @@ jobs:
 
       - run: npx nx run-many -t lint test build typecheck --exclude domscribe-test-fixtures
 
-  integration:
+  build-registry:
     runs-on: ubuntu-latest
     needs: checks
     steps:
@@ -63,12 +63,84 @@ jobs:
       - name: Publish to local registry
         run: pnpm run registry:publish:only
 
+      - name: Upload registry storage
+        uses: actions/upload-artifact@v4
+        with:
+          name: verdaccio-storage
+          path: tmp/local-registry/storage
+          retention-days: 1
+
+  integration:
+    runs-on: ubuntu-latest
+    needs: build-registry
+    env:
+      DS_MAX_BUILD_OVERHEAD_PERCENT: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        fixture:
+          - vite-v5-react-18-js
+          - vite-v5-react-18-ts
+          - vite-v5-vue-3-js
+          - vite-v5-vue-3-ts
+          - webpack-v5-react-18-js
+          - webpack-v5-react-18-ts
+          - webpack-v5-react-19-js
+          - webpack-v5-react-19-ts
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: tree:0
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Download registry storage
+        uses: actions/download-artifact@v4
+        with:
+          name: verdaccio-storage
+          path: tmp/local-registry/storage
+
+      - name: Start Verdaccio
+        run: npx verdaccio --config .verdaccio/config.yml --listen 4873 &
+
+      - name: Wait for Verdaccio
+        run: npx wait-on http://localhost:4873 --timeout 30000
+
+      - name: Install fixture
+        run: npx nx run domscribe-test-fixtures:install-fixture--${{ matrix.fixture }}
+
       - name: Run integration tests
-        run: npx nx run domscribe-test-fixtures:integration-all
+        run: npx nx run domscribe-test-fixtures:integration--${{ matrix.fixture }}
 
   e2e:
     runs-on: ubuntu-latest
-    needs: checks
+    needs: build-registry
+    strategy:
+      fail-fast: false
+      matrix:
+        fixture:
+          - vite-v5-react-18-js
+          - vite-v5-react-18-ts
+          - vite-v5-vue-3-js
+          - vite-v5-vue-3-ts
+          - webpack-v5-react-18-js
+          - webpack-v5-react-18-ts
+          - webpack-v5-react-19-js
+          - webpack-v5-react-19-ts
+          - next-v15-js
+          - next-v15-ts
+          - next-v16-js
+          - next-v16-ts
+          - nuxt-v3-js
+          - nuxt-v3-ts
     steps:
       - uses: actions/checkout@v4
         with:
@@ -87,8 +159,11 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm --filter @domscribe/test-fixtures exec playwright install --with-deps chromium
 
-      - name: Build packages
-        run: npx nx run-many -t build --exclude domscribe-test-fixtures
+      - name: Download registry storage
+        uses: actions/download-artifact@v4
+        with:
+          name: verdaccio-storage
+          path: tmp/local-registry/storage
 
       - name: Start Verdaccio
         run: npx verdaccio --config .verdaccio/config.yml --listen 4873 &
@@ -96,19 +171,16 @@ jobs:
       - name: Wait for Verdaccio
         run: npx wait-on http://localhost:4873 --timeout 30000
 
-      - name: Authenticate to local registry
-        run: npm config set //localhost:4873/:_authToken dummy-token
-
-      - name: Publish to local registry
-        run: pnpm run registry:publish:only
+      - name: Install fixture
+        run: npx nx run domscribe-test-fixtures:install-fixture--${{ matrix.fixture }}
 
       - name: Run e2e tests
-        run: npx nx run domscribe-test-fixtures:e2e-all
+        run: FIXTURE_ID=${{ matrix.fixture }} pnpm --filter @domscribe/test-fixtures exec playwright test --grep ${{ matrix.fixture }}
 
       - name: Upload Playwright report
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
-          path: playwright-report/
+          name: playwright-report-${{ matrix.fixture }}
+          path: packages/domscribe-test-fixtures/playwright-report/
           retention-days: 7

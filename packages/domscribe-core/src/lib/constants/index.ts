@@ -4,12 +4,6 @@
  */
 
 /**
- * Domscribe system version.
- * Should match package.json version.
- */
-export const DOMSCRIBE_VERSION = '0.0.1';
-
-/**
  * Base API paths
  */
 export const API_PATHS = {

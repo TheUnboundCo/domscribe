@@ -28,8 +28,14 @@ import {
 // Constants
 // ---------------------------------------------------------------------------
 
-/** Maximum acceptable build overhead for Webpack A/B comparison (%) */
-const MAX_BUILD_OVERHEAD_PERCENT = 50;
+/**
+ * Maximum acceptable build overhead (%).
+ * Local default is strict (50%) to catch regressions early.
+ * CI runners are slower and noisier — set DS_MAX_BUILD_OVERHEAD_PERCENT=75
+ * in the workflow to allow for that.
+ */
+const MAX_BUILD_OVERHEAD_PERCENT =
+  Number(process.env['DS_MAX_BUILD_OVERHEAD_PERCENT']) || 50;
 
 /** Number of iterations for the full build A/B comparison */
 const BUILD_ITERATIONS = 3;

@@ -8,7 +8,7 @@
  *   mcp     - Start MCP adapter for agent integration
  */
 import { Command } from 'commander';
-import { DOMSCRIBE_VERSION } from '@domscribe/core';
+import { RELAY_VERSION } from '../version.js';
 import { InitCommand } from './commands/init.command.js';
 import { ServeCommand } from './commands/serve.command.js';
 import { StopCommand } from './commands/stop.command.js';
@@ -22,7 +22,7 @@ program
   .description(
     'Domscribe Relay - Local development server for UI-aware dev tooling',
   )
-  .version(DOMSCRIBE_VERSION);
+  .version(RELAY_VERSION);
 
 /**
  * serve command - Start the relay server

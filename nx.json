@@ -84,8 +84,8 @@
   "release": {
     "projects": ["*", "!domscribe-test-fixtures"],
     "git": {
-      "commit": true,
-      "tag": true
+      "commit": false,
+      "tag": false
     }
   }
 }
