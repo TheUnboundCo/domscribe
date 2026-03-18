@@ -17,7 +17,7 @@
     "release:publish": "nx run-many -t sync-dist && nx release publish",
     "registry:publish": "pnpm run build:all && pnpm run registry:publish:only",
     "registry:publish:only": "pnpm run release:version:local && pnpm run release:publish:local",
-    "registry:install": "node --import @swc-node/register/esm packages/domscribe-test-fixtures/scripts/install-fixtures.ts",
+    "registry:install": "node --import @swc-node/register/esm packages/domscribe-test-fixtures/scripts/install-fixture.ts",
     "pipeline:full": "pnpm run registry:publish && pnpm run registry:install && nx run-many -t integration,e2e -p domscribe-test-fixtures",
     "pipeline:integration": "nx integration domscribe-test-fixtures",
     "pipeline:e2e": "pnpm run registry:publish && pnpm run registry:install && nx e2e domscribe-test-fixtures"
