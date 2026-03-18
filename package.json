@@ -8,7 +8,7 @@
     "build:all": "nx run-many -t=lint,test,build --exclude domscribe-test-fixtures --output-style=stream",
     "build:affected": "nx affected -t lint,test,build --exclude domscribe-test-fixtures --output-style=stream",
     "release:version:local": "nx release version prerelease --preid dev --git-commit=false --git-tag=false --stage-changes=false",
-    "release:publish:local": "nx run-many -t sync-dist && nx release publish --registry=http://localhost:4873",
+    "release:publish:local": "nx run-many -t sync-dist && nx release publish --registry=http://localhost:4873 --access public",
     "release:local": "pnpm run build:all && pnpm run release:version:local && pnpm run release:publish:local",
     "release:local:affected": "pnpm run build:affected && pnpm run release:version:local && pnpm run release:publish:local",
     "release:patch": "pnpm run build:all && nx release version patch && pnpm run release:publish",
