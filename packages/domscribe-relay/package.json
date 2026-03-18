@@ -1,6 +1,6 @@
 {
   "name": "@domscribe/relay",
-  "version": "0.0.1-dev.167",
+  "version": "0.1.0",
   "type": "module",
   "main": "src/index.ts",
   "exports": {
@@ -13,7 +13,7 @@
     "./program": "./program/index.js"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "restricted"
   },
   "distBin": {
     "domscribe": "./cli/bin/main.js",

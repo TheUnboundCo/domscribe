@@ -1,10 +1,10 @@
 {
   "name": "@domscribe/runtime",
-  "version": "0.0.1-dev.167",
+  "version": "0.1.0",
   "type": "module",
   "main": "src/index.ts",
   "publishConfig": {
-    "access": "public"
+    "access": "restricted"
   },
   "dependencies": {
     "@domscribe/core": "workspace:*"

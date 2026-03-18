@@ -29,7 +29,6 @@ Domscribe bridges both directions: click a DOM element to tell your agent what t
 
 Your agent is editing `Button.tsx` line 12. It calls `domscribe.query.bySource` and instantly gets back the live DOM snapshot, current props, component state, and rendered attributes — without any human interaction. The agent can verify what an element looks like _before_ changing it and confirm the result _after_.
 
-
 <p align="center">
   <img src="./docs/code-to-ui.png" alt="Code → UI: Let the agent see the browser" />
 </p>
@@ -282,19 +281,19 @@ Then add this MCP config to your agent:
 
 ## Comparison
 
-| Feature               | Domscribe                                    | Stagewise                | DevInspector MCP                         | React Grab                          | Frontman                  | Inspector        | JSX Tool             | Onlook                            |
-| --------------------- | -------------------------------------------- | ------------------------ | ---------------------------------------- | ----------------------------------- | ------------------------- | ---------------- | -------------------- | --------------------------------- |
-| Build-time stable IDs | ✅ `data-ds` via AST                         | ❌ Proxy-based           | ❌ No stable IDs                         | ❌ `_debugSource`                   | ❌ Source maps            | ❌               | ❌                   | ⚠️ `data-oid` (different purpose) |
-| DOM→source manifest   | ✅ JSONL, append-only                        | ❌                       | ❌                                       | ❌                                  | ❌                        | ❌               | ❌                   | ❌                                |
-| Code→live DOM query   | ✅ Agent queries source, gets live runtime   | ❌                       | ❌                                       | ❌                                  | ❌                        | ❌               | ❌                   | ❌                                |
-| Runtime props/state   | ✅ Fiber + VNode walking                     | ⚠️ Shallow               | ⚠️ DOM-level + JS eval                   | ⚠️ Shallow (bippy)                  | ⚠️ Framework APIs         | ❌               | ⚠️ DOM context       | ❌                                |
-| Multi-framework       | ✅ React · Vue · Next.js · Nuxt · extensible | ✅ React + Vue + Angular | ✅ React + Vue + Svelte + Solid + Preact | ❌ React only                       | ⚠️ Next.js + Astro + Vite | ❌ React only    | ❌ React only        | ❌ React only (Next.js)           |
-| Multi-bundler         | ✅ Vite + Webpack + Turbopack                | ❌ N/A (proxy)           | ✅ Vite + Webpack + Turbopack            | ❌ N/A                              | ❌ Dev server middleware  | ❌               | ❌                   | ❌ Webpack (Babel)                |
-| MCP tools             | ✅ 12 tools + 4 prompts                      | ⚠️ Framework plugins     | ✅ 9 tools                               | ⚠️ Lightweight add-on               | ❌ Built-in agent         | ❌               | ❌                   | ❌                                |
-| Agent-agnostic        | ✅ Any MCP client                            | ✅                       | ✅                                       | ✅                                  | ❌ Bundled Elixir agent   | ✅               | ✅                   | ❌ Built-in editor                |
-| In-app element picker | ✅ Lit shadow DOM                            | ✅ Toolbar               | ✅ Inspector bar                         | ✅ Click-to-capture                 | ✅ Chat interface         | ✅ Visual editor | ✅ Browser extension | ✅ Visual editor                  |
-| Source mapping        | ✅ Deterministic (AST IDs)                   | ⚠️ AI-inferred           | ⚠️ Source maps                           | ❌ `_debugSource` (broken React 19) | ⚠️ Source maps            | ⚠️ Unclear       | ⚠️ Browser extension | ✅ Deterministic (AST)            |
-| License               | ✅ MIT                                       | ⚠️ AGPL                  | ✅ Open source                           | ✅ Open source                      | ⚠️ Apache + AGPL          | ❌ Closed        | ✅ MIT               | ✅ Open source                    |
+| Feature               | Domscribe                                    | Stagewise                | DevInspector MCP                         | React Grab                          | Frontman                  |
+| --------------------- | -------------------------------------------- | ------------------------ | ---------------------------------------- | ----------------------------------- | ------------------------- |
+| Build-time stable IDs | ✅ `data-ds` via AST                         | ❌ Proxy-based           | ❌ No stable IDs                         | ❌ `_debugSource`                   | ❌ Source maps            |
+| DOM→source manifest   | ✅ JSONL, append-only                        | ❌                       | ❌                                       | ❌                                  | ❌                        |
+| Code→live DOM query   | ✅ Agent queries source, gets live runtime   | ❌                       | ❌                                       | ❌                                  | ❌                        |
+| Runtime props/state   | ✅ Fiber + VNode walking                     | ⚠️ Shallow               | ⚠️ DOM-level + JS eval                   | ⚠️ Shallow (bippy)                  | ⚠️ Framework APIs         |
+| Multi-framework       | ✅ React · Vue · Next.js · Nuxt · extensible | ✅ React + Vue + Angular | ✅ React + Vue + Svelte + Solid + Preact | ❌ React only                       | ⚠️ Next.js + Astro + Vite |
+| Multi-bundler         | ✅ Vite + Webpack + Turbopack                | ❌ N/A (proxy)           | ✅ Vite + Webpack + Turbopack            | ❌ N/A                              | ❌ Dev server middleware  |
+| MCP tools             | ✅ 12 tools + 4 prompts                      | ⚠️ Framework plugins     | ✅ 9 tools                               | ⚠️ Lightweight add-on               | ❌ Built-in agent         |
+| Agent-agnostic        | ✅ Any MCP client                            | ✅                       | ✅                                       | ✅                                  | ❌ Bundled Elixir agent   |
+| In-app element picker | ✅ Lit shadow DOM                            | ✅ Toolbar               | ✅ Inspector bar                         | ✅ Click-to-capture                 | ✅ Chat interface         |
+| Source mapping        | ✅ Deterministic (AST IDs)                   | ⚠️ AI-inferred           | ⚠️ Source maps                           | ❌ `_debugSource` (broken React 19) | ⚠️ Source maps            |
+| License               | ✅ MIT                                       | ⚠️ AGPL                  | ✅ Open source                           | ✅ Open source                      | ⚠️ Apache + AGPL          |
 
 No single competitor combines build-time stable IDs, deep runtime capture, bidirectional source↔DOM querying, and an MCP tool surface in a framework-agnostic way.
 
