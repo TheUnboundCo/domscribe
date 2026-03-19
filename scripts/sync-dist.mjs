@@ -11,7 +11,7 @@
  * 3. Patches subpath exports from the distExports field
  * 4. Patches bin entries from the distBin field
  */
-import { readFileSync, writeFileSync, readdirSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, readdirSync, existsSync, chmodSync } from 'fs';
 import { join, resolve } from 'path';
 
 const projectName = process.argv[2];
@@ -122,11 +122,18 @@ if (source) {
   }
 }
 
-// 4. Patch bin entries from distBin
+// 4. Patch bin entries from distBin and set execute permissions
 if (source && source.pkg.distBin && typeof source.pkg.distBin === 'object') {
   distPkg.bin = source.pkg.distBin;
+  const distDir = resolve(workspaceRoot, 'dist/packages', projectName);
   for (const [name, binPath] of Object.entries(source.pkg.distBin)) {
-    console.log(`  bin["${name}"]: patched -> ${binPath}`);
+    const absBinPath = resolve(distDir, binPath);
+    if (existsSync(absBinPath)) {
+      chmodSync(absBinPath, 0o755);
+      console.log(`  bin["${name}"]: patched -> ${binPath} (chmod +x)`);
+    } else {
+      console.log(`  bin["${name}"]: patched -> ${binPath} (file not yet built)`);
+    }
   }
   modified = true;
 }
