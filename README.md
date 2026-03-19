@@ -15,9 +15,8 @@
 </p>
 
 <p align="center">
-  <img src="./docs/demo.gif" alt="Domscribe demo — click an element, capture context, resolve to source" />
+  <a href="https://domscribe.com"><img src="./docs/demo.gif" alt="Domscribe demo — click an element, capture context, resolve to source" /></a>
 </p>
-
 
 ---
 
