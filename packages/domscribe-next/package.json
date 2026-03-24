@@ -1,6 +1,6 @@
 {
   "name": "@domscribe/next",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Next.js integration for Domscribe",
   "type": "module",
   "main": "src/index.ts",
