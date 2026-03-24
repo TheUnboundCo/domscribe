@@ -26,80 +26,6 @@ Domscribe bridges both directions: click a DOM element to tell your agent what t
 
 ---
 
-## What Domscribe Does
-
-### Code → UI: Let the agent see the browser
-
-Your agent is editing `Button.tsx` line 12. It calls `domscribe.query.bySource` and instantly gets back the live DOM snapshot, current props, component state, and rendered attributes — without any human interaction. The agent can verify what an element looks like _before_ changing it and confirm the result _after_.
-
-<p align="center">
-  <img src="./docs/code-to-ui.png" alt="Code → UI: Let the agent see the browser" />
-</p>
-
-Here's an example response that the agent might get back:
-
-```json
-{
-  "sourceLocation": {
-    "file": "src/components/Button.tsx",
-    "line": 12,
-    "column": 4,
-    "componentName": "Button",
-    "tagName": "button"
-  },
-  "runtime": {
-    "componentProps": { "variant": "secondary", "onClick": "[Function]" },
-    "componentState": { "hook_0": false, "hook_1": "idle" },
-    "domSnapshot": {
-      "tagName": "button",
-      "attributes": { "class": "btn-secondary", "type": "submit" },
-      "innerText": "Save changes"
-    }
-  },
-  "browserConnected": true
-}
-```
-
-### UI → Code: Point and tell
-
-A developer clicks an element in the browser overlay, types "make this button use the primary color," and submits. Domscribe captures the element's source location, runtime context, and user intent as an annotation. The agent claims it, navigates to the exact file and line, and implements the change.
-
-<p align="center">
-  <img src="./docs/ui-to-code.png" alt="UI → Code: Point and tell" />
-</p>
-
-The annotation is stored as a JSON file in your repository in the `.domscribe/annotations` directory. Here's an example:
-
-```json
-{
-  "found": true,
-  "annotationId": "ann_A1B2C3D4_1710500000",
-  "userIntent": "Make this button use the primary color from the design system",
-  "element": {
-    "tagName": "button",
-    "dataDs": "A1B2C3D4",
-    "selector": "main > div > button",
-    "attributes": { "class": "btn-secondary", "type": "submit" },
-    "innerText": "Save changes"
-  },
-  "sourceLocation": {
-    "file": "src/components/Button.tsx",
-    "line": 12,
-    "column": 4,
-    "componentName": "Button",
-    "tagName": "button"
-  },
-  "runtimeContext": {
-    "componentProps": { "variant": "secondary", "onClick": "[Function]" },
-    "componentState": { "hook_0": false, "hook_1": "idle" }
-  }
-}
-```
-
-Once the agent is done with the edits, it calls `domscribe.annotation.respond` with a description of what it did. The overlay shows the result in real time via WebSocket.
-
----
-
 ## Getting Started
 
 ```bash
@@ -114,6 +40,24 @@ The setup wizard walks you through two steps:
 That's it. Start your dev server and you're ready to go.
 
 > Prefer to set things up manually, or need finer control? See the [manual setup](#manual-setup) instructions below.
+
+---
+
+## Table of Contents
+
+- [What Domscribe Does](#what-domscribe-does)
+- [Manual Setup](#manual-setup)
+- [How It Works](#how-it-works)
+- [Comparison](#comparison)
+- [Bundler Support](#bundler-support--domsource-mapping)
+- [Framework Support](#framework-support--runtime-context-capture)
+- [MCP Tools Reference](#mcp-tools-reference)
+- [Annotation Lifecycle](#annotation-lifecycle)
+- [Relay CLI](#relay-cli)
+- [Zero Production Impact](#zero-production-impact)
+- [Integration Tests](#integration-tests)
+- [Packages](#packages)
+- [Contributing](#contributing)
 
 ---
 
@@ -358,6 +302,80 @@ Then add this MCP config to your agent:
   }
 }
 ```
+
+---
+
+## What Domscribe Does
+
+### Code → UI: Let the agent see the browser
+
+Your agent is editing `Button.tsx` line 12. It calls `domscribe.query.bySource` and instantly gets back the live DOM snapshot, current props, component state, and rendered attributes — without any human interaction. The agent can verify what an element looks like _before_ changing it and confirm the result _after_.
+
+<p align="center">
+  <img src="./docs/code-to-ui.png" alt="Code → UI: Let the agent see the browser" />
+</p>
+
+Here's an example response that the agent might get back:
+
+```json
+{
+  "sourceLocation": {
+    "file": "src/components/Button.tsx",
+    "line": 12,
+    "column": 4,
+    "componentName": "Button",
+    "tagName": "button"
+  },
+  "runtime": {
+    "componentProps": { "variant": "secondary", "onClick": "[Function]" },
+    "componentState": { "hook_0": false, "hook_1": "idle" },
+    "domSnapshot": {
+      "tagName": "button",
+      "attributes": { "class": "btn-secondary", "type": "submit" },
+      "innerText": "Save changes"
+    }
+  },
+  "browserConnected": true
+}
+```
+
+### UI → Code: Point and tell
+
+A developer clicks an element in the browser overlay, types "make this button use the primary color," and submits. Domscribe captures the element's source location, runtime context, and user intent as an annotation. The agent claims it, navigates to the exact file and line, and implements the change.
+
+<p align="center">
+  <img src="./docs/ui-to-code.png" alt="UI → Code: Point and tell" />
+</p>
+
+The annotation is stored as a JSON file in your repository in the `.domscribe/annotations` directory. Here's an example:
+
+```json
+{
+  "found": true,
+  "annotationId": "ann_A1B2C3D4_1710500000",
+  "userIntent": "Make this button use the primary color from the design system",
+  "element": {
+    "tagName": "button",
+    "dataDs": "A1B2C3D4",
+    "selector": "main > div > button",
+    "attributes": { "class": "btn-secondary", "type": "submit" },
+    "innerText": "Save changes"
+  },
+  "sourceLocation": {
+    "file": "src/components/Button.tsx",
+    "line": 12,
+    "column": 4,
+    "componentName": "Button",
+    "tagName": "button"
+  },
+  "runtimeContext": {
+    "componentProps": { "variant": "secondary", "onClick": "[Function]" },
+    "componentState": { "hook_0": false, "hook_1": "idle" }
+  }
+}
+```
+
+Once the agent is done with the edits, it calls `domscribe.annotation.respond` with a description of what it did. The overlay shows the result in real time via WebSocket.
 
 ---
 
