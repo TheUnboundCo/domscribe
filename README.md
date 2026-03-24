@@ -45,8 +45,8 @@ That's it. Start your dev server and you're ready to go.
 
 ## Table of Contents
 
-- [What Domscribe Does](#what-domscribe-does)
 - [Manual Setup](#manual-setup)
+- [What Domscribe Does](#what-domscribe-does)
 - [How It Works](#how-it-works)
 - [Comparison](#comparison)
 - [Bundler Support](#bundler-support--domsource-mapping)
