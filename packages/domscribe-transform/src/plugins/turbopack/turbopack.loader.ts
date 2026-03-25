@@ -414,13 +414,14 @@ async function transformWithInit(
   if (preamble) {
     // Insert after 'use client'/'use server' directive so we don't
     // violate Next.js/Turbopack's requirement that it be the first expression.
+    // The regex allows leading comments (line or block) before the directive,
+    // which is valid JS and common in codebases using lint-ignore pragmas.
     const directiveMatch = transformedCode.match(
-      /^(['"])use (client|server)\1;?[ \t]*\r?\n?/,
+      /^(?:[ \t]*(?:\/\/[^\n]*|\/\*[\s\S]*?\*\/)[ \t]*\r?\n)*[ \t]*(['"])use (client|server)\1;?[ \t]*\r?\n?/,
     );
     if (directiveMatch) {
-      const directive = directiveMatch[0];
-      outputCode =
-        directive + preamble + transformedCode.slice(directive.length);
+      const prologue = directiveMatch[0];
+      outputCode = prologue + preamble + transformedCode.slice(prologue.length);
     } else {
       outputCode = preamble + transformedCode;
     }

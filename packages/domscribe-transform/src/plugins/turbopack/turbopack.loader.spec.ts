@@ -462,6 +462,35 @@ describe('Turbopack Loader', () => {
       expect(directiveIndex).toBe(0);
     });
 
+    it('should inject preamble after use client with leading comments', async () => {
+      // Arrange — files with lint-ignore comments before "use client"
+      const source =
+        '/** biome-ignore-all */\n/** another comment */\n"use client";\nimport React from "react";';
+      const context = createLoaderContext('/test/InputGroup.tsx');
+      const asyncCallback = vi.fn();
+      context.async = vi.fn(() => asyncCallback);
+      mockInjector.inject.mockReturnValue(
+        createMockInjectorResult(
+          '/** biome-ignore-all */\n/** another comment */\n"use client";\ntransformed',
+          1,
+        ),
+      );
+
+      // Act
+      loaderModule.default.call(context, source);
+      await vi.waitFor(() => expect(asyncCallback).toHaveBeenCalled());
+
+      // Assert — comments + directive must come before the preamble
+      const outputCode = asyncCallback.mock.calls[0][1] as string;
+      const directiveIndex = outputCode.indexOf('"use client"');
+      const preambleIndex = outputCode.indexOf('__DOMSCRIBE_RELAY_PORT__');
+      expect(directiveIndex).toBeLessThan(preambleIndex);
+      // Comments should be preserved before the directive
+      expect(outputCode.indexOf('biome-ignore-all')).toBeLessThan(
+        directiveIndex,
+      );
+    });
+
     it('should inject client globals after use server directive', async () => {
       // Arrange
       const source = '"use server";\nexport async function action() {}';
