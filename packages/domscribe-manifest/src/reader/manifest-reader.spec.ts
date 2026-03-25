@@ -2,11 +2,27 @@
  * Tests for ManifestReader
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { existsSync, mkdirSync, rmSync, writeFileSync } from 'fs';
+import {
+  existsSync,
+  mkdirSync,
+  rmSync,
+  writeFileSync,
+  watchFile,
+  unwatchFile,
+} from 'fs';
 import path from 'path';
 import { tmpdir } from 'os';
 import { ManifestReader } from './manifest-reader.js';
 import type { ManifestEntry } from '@domscribe/core';
+
+vi.mock('fs', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('fs')>();
+  return {
+    ...actual,
+    watchFile: vi.fn(actual.watchFile),
+    unwatchFile: vi.fn(actual.unwatchFile),
+  };
+});
 
 describe('ManifestReader', () => {
   let reader: ManifestReader;
@@ -464,6 +480,112 @@ describe('ManifestReader', () => {
       // Should not throw and should call both listeners
       reader.reload();
       expect(goodListener).toHaveBeenCalled();
+    });
+  });
+
+  describe('file watching', () => {
+    type WatchCallback = (
+      curr: { mtimeMs: number },
+      prev: { mtimeMs: number },
+    ) => void;
+    let watchFileCallback: WatchCallback | null;
+
+    beforeEach(() => {
+      watchFileCallback = null;
+
+      // Capture the watchFile callback so we can invoke it deterministically
+      vi.mocked(watchFile).mockImplementation(
+        (_path: unknown, _opts: unknown, cb?: unknown) => {
+          const listener = typeof _opts === 'function' ? _opts : cb;
+          watchFileCallback = listener as WatchCallback;
+          return undefined as never;
+        },
+      );
+    });
+
+    afterEach(() => {
+      vi.mocked(watchFile).mockRestore();
+      vi.mocked(unwatchFile).mockRestore();
+    });
+
+    /** Simulate a watchFile poll cycle where mtime changed */
+    const simulateFileChange = (newMtimeMs = Date.now()) => {
+      expect(watchFileCallback).not.toBeNull();
+      watchFileCallback!({ mtimeMs: newMtimeMs }, { mtimeMs: 0 });
+    };
+
+    it('sets up watcher even when manifest file does not exist', () => {
+      // Arrange & Act — initialize with no manifest on disk
+      reader = new ManifestReader(testDir);
+      reader.initialize();
+
+      // Assert — watchFile was called (watcher is active)
+      expect(watchFileCallback).not.toBeNull();
+    });
+
+    it('detects manifest file created after initialization', () => {
+      // Arrange — initialize with no manifest on disk
+      reader = new ManifestReader(testDir);
+      reader.initialize();
+      expect(reader.getStats().entryCount).toBe(0);
+
+      // Act — create the manifest and simulate the watcher firing
+      writeManifest([createTestEntry('abc12345'), createTestEntry('def67890')]);
+      simulateFileChange();
+
+      // Assert
+      expect(reader.getStats().entryCount).toBe(2);
+      expect(reader.resolve('abc12345').success).toBe(true);
+      expect(reader.resolve('def67890').success).toBe(true);
+    });
+
+    it('detects changes to existing manifest file', () => {
+      // Arrange — initialize with one entry
+      writeManifest([createTestEntry('abc12345')]);
+      reader = new ManifestReader(testDir);
+      reader.initialize();
+      expect(reader.getStats().entryCount).toBe(1);
+
+      // Act — rewrite manifest with two entries and simulate watcher
+      writeManifest([createTestEntry('abc12345'), createTestEntry('def67890')]);
+      simulateFileChange();
+
+      // Assert
+      expect(reader.getStats().entryCount).toBe(2);
+    });
+
+    it('emits manifest:updated when file appears after initialization', () => {
+      // Arrange
+      reader = new ManifestReader(testDir);
+      reader.initialize();
+      const listener = vi.fn();
+      reader.onEvent(listener);
+
+      // Act
+      writeManifest([createTestEntry('abc12345')]);
+      simulateFileChange();
+
+      // Assert
+      expect(listener).toHaveBeenCalledWith({
+        type: 'manifest:updated',
+        data: expect.objectContaining({ entryCount: 1 }),
+      });
+    });
+
+    it('does not reload when mtime has not changed', () => {
+      // Arrange
+      writeManifest([createTestEntry('abc12345')]);
+      reader = new ManifestReader(testDir);
+      reader.initialize();
+      const listener = vi.fn();
+      reader.onEvent(listener);
+
+      // Act — simulate poll where mtime is unchanged
+      const sameMtime = Date.now();
+      watchFileCallback!({ mtimeMs: sameMtime }, { mtimeMs: sameMtime });
+
+      // Assert — no reload occurred
+      expect(listener).not.toHaveBeenCalled();
     });
   });
 

@@ -341,16 +341,14 @@ export class ManifestReader {
   }
 
   private startWatching(): void {
-    if (!existsSync(this.manifestPath)) {
-      return;
-    }
-
-    // Watch for changes to manifest file
+    // watchFile uses stat-polling, so it works even if the file doesn't exist yet.
+    // When the file is created, curr.mtime will differ from prev.mtime (epoch 0),
+    // triggering the initial load.
     this.fileWatcher = watchFile(
       this.manifestPath,
       { interval: 500 },
       (curr, prev) => {
-        if (curr.mtime !== prev.mtime) {
+        if (curr.mtimeMs !== prev.mtimeMs) {
           this.reload();
         }
       },

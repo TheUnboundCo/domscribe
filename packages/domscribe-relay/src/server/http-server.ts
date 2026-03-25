@@ -127,13 +127,11 @@ export async function createRelayServer(
   await annotationService.initialize();
   manifestReader.initialize();
 
-  // Register handlers
+  // Register handlers — statusOptions.port is updated after listen() to reflect the bound port
+  const statusOptions = { port, startTime };
   registerShutdownHandler(app);
   registerHealthHandler(app, manifestReader, annotationService);
-  registerStatusHandler(app, manifestReader, annotationService, {
-    port,
-    startTime,
-  });
+  registerStatusHandler(app, manifestReader, annotationService, statusOptions);
   registerManifestHandlers(app, manifestReader);
   registerAnnotationHandlers(app, annotationService, manifestReader);
 
@@ -182,8 +180,11 @@ export async function createRelayServer(
         );
       }
 
+      const boundPort = parseInt(url.port, 10);
+      statusOptions.port = boundPort;
+
       return {
-        port: parseInt(url.port, 10), // Dynamically assigned port
+        port: boundPort,
         host: url.hostname,
       };
     },
